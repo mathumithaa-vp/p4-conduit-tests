@@ -1,0 +1,33 @@
+name: Playwright tests
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          # Node.js 24.22.1 is the version used for our successful local run with 24 passing tests.
+          node-version: 24
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the Playwright tests
+        run: npx playwright test
+
+      - name: Keep the HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report
+          path: playwright-report/
